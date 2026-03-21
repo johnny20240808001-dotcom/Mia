@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Mia 健康評估 - 題庫管理後台</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { margin-top: 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; }
+        th { background: #f8fafc; font-weight: bold; color: #475569; }
+        input[type="text"] { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: #3b82f6; outline: none; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-add { background: #3b82f6; margin-bottom: 10px; }
+        .btn-save { background: #10b981; font-size: 16px; width: 100%; margin-top: 20px; padding: 15px; }
+        .btn-delete { background: #ef4444; padding: 6px 10px; font-size: 12px; }
+        .status { margin-top: 15px; font-weight: bold; color: #10b981; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚙️ 題庫管理後台 (T.C STUDIO)</h1>
+    <button class="btn btn-add" onclick="addRow()">+ 新增一題</button>
+    
+    <table>
+        <thead>
+            <tr>
+                <th width="8%">題號</th>
+                <th width="20%">題目內容</th>
+                <th width="12%">選項A</th>
+                <th width="8%">導向A</th>
+                <th width="12%">標籤A</th>
+                <th width="12%">選項B</th>
+                <th width="8%">導向B</th>
+                <th width="12%">標籤B</th>
+                <th width="8%">操作</th>
+            </tr>
+        </thead>
+        <tbody id="q-body">
+            </tbody>
+    </table>
+
+    <button class="btn btn-save" onclick="saveQuestions()">💾 儲存所有題庫至系統</button>
+    <div id="msg" class="status"></div>
+</div>
+
+<script>
+    // ==========================================
+    // 🚨 這裡請換成你最新部署的 GAS API 網址！
+    // ==========================================
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz-0vA1TVD9cYaIyWF3sXugr3U45hNab2otMbc7gVpn0L3xw9Xmbr9d48zSkGXg2JFbbg/exec"; 
+    // ==========================================
+
+    let questions = [];
+
+    // 1. 網頁載入時，先抓取現有題庫
+    async function fetchQuestions() {
+        document.getElementById('msg').innerText = "載入中...";
+        try {
+            const res = await fetch(GAS_API_URL);
+            const data = await res.json();
+            if(data.status === 'success') {
+                questions = data.data;
+                renderTable();
+                document.getElementById('msg').innerText = "";
+            }
+        } catch(e) {
+            document.getElementById('msg').innerText = "載入失敗，請檢查網路或 API 網址";
+        }
+    }
+
+    // 2. 將資料畫成表格
+    function renderTable() {
+        const tbody = document.getElementById('q-body');
+        tbody.innerHTML = '';
+        questions.forEach((q, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${q['題號'] || ''}" onchange="updateData(${index}, '題號', this.value)"></td>
+                <td><input type="text" value="${q['題目內容'] || ''}" onchange="updateData(${index}, '題目內容', this.value)"></td>
+                <td><input type="text" value="${q['選項A'] || ''}" onchange="updateData(${index}, '選項A', this.value)"></td>
+                <td><input type="text" value="${q['導向題號A'] || ''}" onchange="updateData(${index}, '導向題號A', this.value)"></td>
+                <td><input type="text" value="${q['標籤A'] || ''}" onchange="updateData(${index}, '標籤A', this.value)"></td>
+                <td><input type="text" value="${q['選項B'] || ''}" onchange="updateData(${index}, '選項B', this.value)"></td>
+                <td><input type="text" value="${q['導向題號B'] || ''}" onchange="updateData(${index}, '導向題號B', this.value)"></td>
+                <td><input type="text" value="${q['標籤B'] || ''}" onchange="updateData(${index}, '標籤B', this.value)"></td>
+                <td style="text-align:center;"><button class="btn btn-delete" onclick="deleteRow(${index})">刪除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 3. 更新記憶體中的資料
+    function updateData(index, key, value) {
+        questions[index][key] = value;
+    }
+
+    // 4. 新增一列
+    function addRow() {
+        questions.push({
+            '題號': 'Q', '題目類型': 'radio', '題目內容': '', 
+            '選項A': '', '導向題號A': '', '標籤A': '無', 
+            '選項B': '', '導向題號B': '', '標籤B': '無'
+        });
+        renderTable();
+    }
+
+    // 5. 刪除一列
+    function deleteRow(index) {
+        if(confirm('確定要刪除這題嗎？')) {
+            questions.splice(index, 1);
+            renderTable();
+        }
+    }
+
+    // 6. 儲存回 Google 試算表
+    async function saveQuestions() {
+        const msgDiv = document.getElementById('msg');
+        msgDiv.style.color = "#3b82f6";
+        msgDiv.innerText = "儲存中，請稍候...";
+        
+        try {
+            const res = await fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "updateQuestions", // 告訴 API 我們是要更新題庫
+                    data: questions
+                })
+            });
+            const result = await res.json();
+            
+            if(result.status === 'success') {
+                msgDiv.style.color = "#10b981";
+                msgDiv.innerText = "✅ 題庫儲存成功！客戶端網頁已同步更新。";
+            } else {
+                msgDiv.style.color = "#ef4444";
+                msgDiv.innerText = "❌ 儲存失敗：" + result.message;
+            }
+        } catch(e) {
+            msgDiv.style.color = "#ef4444";
+            msgDiv.innerText = "❌ 網路錯誤，無法儲存。";
+        }
+    }
+
+    window.onload = fetchQuestions;
+</script>
+
+</body>
+</html>
