@@ -3,188 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T.C STUDIO - 智能健康評估後台</title>
+    <title>T.C STUDIO - V3.0 全能管理系統</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #e2e8f0; margin: 0; padding: 20px; color: #1e293b; }
-        .container { max-width: 900px; margin: 0 auto; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         /* 登入畫面 */
         #login-screen { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; margin: 100px auto; }
         #login-screen input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-align: center;}
         
-        /* 後台主畫面 */
+        /* 後台主畫面與頁籤 */
         #admin-screen { display: none; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .header h1 { margin: 0; font-size: 20px; color: #0f172a; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 12px 12px 0 0; border-bottom: 2px solid #e2e8f0; }
+        .header h1 { margin: 0; font-size: 22px; color: #0f172a; }
         
-        /* 題目卡片設計 */
-        .q-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6; }
+        .tabs { display: flex; background: white; padding: 0 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 0 0 12px 12px; margin-bottom: 20px; }
+        .tab-btn { padding: 15px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: bold; color: #64748b; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { color: #3b82f6; }
+        .tab-btn.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        .tab-content { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 80px; overflow-x: auto; }
+        
+        /* 表格與表單設計 */
+        table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 14px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+        th { background: #f8fafc; color: #475569; font-weight: bold; white-space: nowrap; }
+        td input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+        td input:focus { border-color: #3b82f6; outline: none; }
+        
+        /* 題目卡片設計 (沿用 V2) */
+        .q-card { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; border-left: 5px solid #3b82f6; }
         .q-header { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
-        .q-header input, .q-header select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        .q-header .q-id { width: 80px; font-weight: bold; background: #f8fafc; }
-        .q-header .q-title { flex: 1; font-size: 16px; }
-        
-        /* 選項設計 */
-        .opt-row { display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
-        .opt-row input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
-        .opt-row .opt-target { width: 80px; }
+        .q-header input, .q-header select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .q-header .q-title { flex: 1; }
+        .opt-row { display: flex; gap: 10px; align-items: center; background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+        .opt-row input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; }
         
         /* 按鈕群 */
-        .btn { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; font-size: 14px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; font-size: 14px; }
         .btn-blue { background: #3b82f6; } .btn-blue:hover { background: #2563eb; }
         .btn-green { background: #10b981; } .btn-green:hover { background: #059669; }
-        .btn-red { background: #ef4444; padding: 8px 12px; font-size: 12px; } .btn-red:hover { background: #dc2626; }
-        .btn-gray { background: #64748b; padding: 6px 12px; font-size: 12px; margin-top: 10px;}
+        .btn-red { background: #ef4444; } .btn-red:hover { background: #dc2626; }
         
-        .main-actions { position: sticky; bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 12px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; backdrop-filter: blur(5px); }
-        #status-msg { font-weight: bold; align-self: center; }
+        /* 底部浮動儲存列 */
+        .main-actions { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); padding: 15px 30px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(5px); z-index: 100; }
+        #status-msg { font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <h2>T.C STUDIO</h2>
-        <p style="color:#64748b; font-size:14px;">智能健康評估 - 管理系統</p>
+        <p style="color:#64748b; font-size:14px;">智能評估 V3.0 管理中心</p>
         <input type="password" id="admin-pwd" placeholder="請輸入後台密碼">
-        <button class="btn btn-blue" style="width:100%;" onclick="login()">登入系統</button>
+        <button class="btn btn-blue" style="width:100%; padding:12px;" onclick="login()">安全登入</button>
         <p id="login-err" style="color:#ef4444; font-size:13px; margin-top:10px;"></p>
     </div>
 
     <div id="admin-screen" class="container">
         <div class="header">
-            <h1>⚙️ 題庫管理中心 (V2.0)</h1>
-            <button class="btn btn-blue" onclick="addQuestion()">➕ 新增一道題目</button>
+            <h1>⚙️ T.C STUDIO 全能管理中心</h1>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-questions')">📝 題庫與跳轉邏輯</button>
+            <button class="tab-btn" onclick="switchTab('tab-products')">🛍️ 商品與客製化報價</button>
+            <button class="tab-btn" onclick="switchTab('tab-warnings')">🛑 用藥禁忌與警示</button>
         </div>
 
-        <div id="questions-container"></div>
+        <div id="tab-questions" class="tab-content" style="display: block;">
+            <div style="margin-bottom: 20px;"><button class="btn btn-blue" onclick="addQuestion()">➕ 新增一道題目</button></div>
+            <div id="questions-container"></div>
+        </div>
+
+        <div id="tab-products" class="tab-content">
+            <div style="margin-bottom: 20px;"><button class="btn btn-blue" onclick="addProduct()">➕ 新增一項商品規則</button></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="8%">產品分類</th><th width="5%">優先級</th><th width="10%">對應標籤</th><th width="10%">觸發條件</th><th width="8%">方案級別</th>
+                        <th width="15%">推薦產品名稱</th><th width="20%">客製化專屬文案</th><th width="10%">圖片網址</th><th width="7%">單價</th><th width="7%">優惠規則</th><th width="5%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="products-tbody"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-warnings" class="tab-content">
+            <div style="margin-bottom: 20px;"><button class="btn btn-blue" onclick="addWarning()">➕ 新增一項禁忌警示</button></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="25%">觸發標籤 (逗號分隔=同時滿足)</th>
+                        <th width="20%">排除成分</th>
+                        <th width="45%">警示訊息 (顯示給客人看的警告)</th>
+                        <th width="10%">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="warnings-tbody"></tbody>
+            </table>
+        </div>
 
         <div class="main-actions">
             <span id="status-msg"></span>
-            <button class="btn btn-green" style="font-size:16px; padding:12px 30px;" onclick="saveToServer()">💾 將所有變更儲存至雲端</button>
+            <button class="btn btn-green" style="font-size:18px; padding:12px 40px;" onclick="saveAllToServer()">💾 一鍵儲存所有變更至雲端</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 🚨 這裡請換成你最新部署的 GAS API 網址！
+        // 🚨 這裡請換成你最新部署的 V3.0 API 網址！
         // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz-0vA1TVD9cYaIyWF3sXugr3U45hNab2otMbc7gVpn0L3xw9Xmbr9d48zSkGXg2JFbbg/exec"; 
         // ==========================================
 
         let adminPassword = "";
-        let questions = [];
+        let sysData = { questions: [], products: [], warnings: [] };
 
-        // 1. 登入邏輯
+        // --- 登入與資料抓取 ---
         function login() {
             const pwd = document.getElementById('admin-pwd').value;
             if(!pwd) return document.getElementById('login-err').innerText = "密碼不可為空！";
-            
             adminPassword = pwd;
             document.getElementById('login-screen').style.display = "none";
             document.getElementById('admin-screen').style.display = "block";
-            fetchQuestions();
+            fetchAllData();
         }
 
-        // 2. 抓取現有題庫
-        async function fetchQuestions() {
-            showMsg("從雲端讀取題庫中...", "#3b82f6");
+        async function fetchAllData() {
+            showMsg("從雲端讀取所有資料中...", "#3b82f6");
             try {
                 const res = await fetch(GAS_API_URL);
-                const data = await res.json();
-                if(data.status === 'success') {
-                    questions = data.data;
-                    renderUI();
-                    showMsg("✅ 讀取完成", "#10b981");
+                const result = await res.json();
+                if(result.status === 'success') {
+                    sysData = result.data;
+                    renderAllUI();
+                    showMsg("✅ 資料讀取完成", "#10b981");
                     setTimeout(() => showMsg("", ""), 3000);
                 }
             } catch(e) {
-                showMsg("❌ 讀取失敗，請檢查網路", "#ef4444");
+                showMsg("❌ 讀取失敗，請檢查網路或 API 網址", "#ef4444");
             }
         }
 
-        // 3. 繪製卡片介面
-        function renderUI() {
+        // --- 頁籤切換 ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // --- 渲染三大區塊 UI ---
+        function renderAllUI() {
+            renderQuestions();
+            renderProducts();
+            renderWarnings();
+        }
+
+        // 📝 1. 題庫渲染邏輯
+        function renderQuestions() {
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
-
-            questions.forEach((q, qIndex) => {
-                // 確保選項設定是陣列
+            (sysData.questions || []).forEach((q, qIdx) => {
                 if(!Array.isArray(q['選項設定'])) q['選項設定'] = [];
-
-                let optsHtml = q['選項設定'].map((opt, optIndex) => `
+                let optsHtml = q['選項設定'].map((opt, oIdx) => `
                     <div class="opt-row">
-                        <span style="font-size:12px; color:#94a3b8;">選項 ${optIndex + 1}</span>
-                        <input type="text" placeholder="選項文字 (例: 經常失眠)" value="${opt.text || ''}" onchange="updateOpt(${qIndex}, ${optIndex}, 'text', this.value)">
-                        <input type="text" class="opt-target" placeholder="導向題號" value="${opt.target || ''}" onchange="updateOpt(${qIndex}, ${optIndex}, 'target', this.value)">
-                        <input type="text" placeholder="標籤 (例: GABA,芝麻素)" value="${opt.tag || ''}" onchange="updateOpt(${qIndex}, ${optIndex}, 'tag', this.value)">
-                        <button class="btn btn-red" onclick="deleteOpt(${qIndex}, ${optIndex})">✖</button>
+                        <span style="font-size:12px; color:#94a3b8; width:40px;">選 ${oIdx + 1}</span>
+                        <input type="text" placeholder="選項文字" value="${opt.text || ''}" onchange="updateQOpt(${qIdx}, ${oIdx}, 'text', this.value)">
+                        <input type="text" style="width:80px; flex:none;" placeholder="導向題號" value="${opt.target || ''}" onchange="updateQOpt(${qIdx}, ${oIdx}, 'target', this.value)">
+                        <input type="text" placeholder="賦予標籤 (逗號分隔)" value="${opt.tag || ''}" onchange="updateQOpt(${qIdx}, ${oIdx}, 'tag', this.value)">
+                        <button class="btn btn-red" style="padding:6px 10px;" onclick="delQOpt(${qIdx}, ${oIdx})">✖</button>
                     </div>
                 `).join('');
 
-                let cardHtml = `
+                container.insertAdjacentHTML('beforeend', `
                     <div class="q-card">
                         <div class="q-header">
-                            <input type="text" class="q-id" placeholder="題號(Q01)" value="${q['題號'] || ''}" onchange="updateQ(${qIndex}, '題號', this.value)">
-                            <select onchange="updateQ(${qIndex}, '題目類型', this.value)">
+                            <input type="text" style="width:80px; font-weight:bold;" placeholder="題號" value="${q['題號'] || ''}" onchange="updateQ(${qIdx}, '題號', this.value)">
+                            <select onchange="updateQ(${qIdx}, '題目類型', this.value)">
                                 <option value="radio" ${q['題目類型'] === 'radio' ? 'selected' : ''}>🔘 單選題</option>
                                 <option value="checkbox" ${q['題目類型'] === 'checkbox' ? 'selected' : ''}>☑️ 複選題</option>
                             </select>
-                            <input type="text" class="q-title" placeholder="請輸入完整題目內容..." value="${q['題目內容'] || ''}" onchange="updateQ(${qIndex}, '題目內容', this.value)">
-                            <button class="btn btn-red" onclick="deleteQuestion(${qIndex})">刪除此題</button>
+                            <input type="text" class="q-title" placeholder="題目內容" value="${q['題目內容'] || ''}" onchange="updateQ(${qIdx}, '題目內容', this.value)">
+                            <button class="btn btn-red" onclick="delQ(${qIdx})">刪除此題</button>
                         </div>
-                        <div class="q-options">
-                            ${optsHtml}
-                            <button class="btn btn-gray" onclick="addOpt(${qIndex})">➕ 新增一個選項</button>
-                        </div>
+                        ${optsHtml}
+                        <button class="btn" style="background:#64748b; margin-top:10px;" onclick="addQOpt(${qIdx})">➕ 新增選項</button>
                     </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHtml);
+                `);
             });
         }
 
-        // --- 資料更新邏輯 ---
-        function updateQ(qIndex, key, value) { questions[qIndex][key] = value; }
-        function updateOpt(qIndex, optIndex, key, value) { questions[qIndex]['選項設定'][optIndex][key] = value; }
-        
-        function addQuestion() {
-            questions.push({ '題號': 'Q', '題目類型': 'radio', '題目內容': '', '選項設定': [] });
-            renderUI();
-            window.scrollTo(0, document.body.scrollHeight);
-        }
-        function deleteQuestion(qIndex) {
-            if(confirm('確定要刪除整道題目嗎？')) { questions.splice(qIndex, 1); renderUI(); }
-        }
-        function addOpt(qIndex) {
-            questions[qIndex]['選項設定'].push({ text: '', target: '', tag: '無' });
-            renderUI();
-        }
-        function deleteOpt(qIndex, optIndex) {
-            questions[qIndex]['選項設定'].splice(optIndex, 1);
-            renderUI();
+        // 🛍️ 2. 商品渲染邏輯
+        function renderProducts() {
+            const tbody = document.getElementById('products-tbody');
+            tbody.innerHTML = '';
+            (sysData.products || []).forEach((p, i) => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td><input type="text" value="${p['產品分類']||''}" onchange="updateP(${i}, '產品分類', this.value)"></td>
+                        <td><input type="number" value="${p['優先級']||''}" onchange="updateP(${i}, '優先級', this.value)"></td>
+                        <td><input type="text" value="${p['對應標籤']||''}" onchange="updateP(${i}, '對應標籤', this.value)"></td>
+                        <td><input type="text" value="${p['觸發條件']||'預設'}" onchange="updateP(${i}, '觸發條件', this.value)"></td>
+                        <td><input type="text" value="${p['方案級別']||'基礎'}" onchange="updateP(${i}, '方案級別', this.value)"></td>
+                        <td><input type="text" value="${p['推薦產品名稱']||''}" onchange="updateP(${i}, '推薦產品名稱', this.value)"></td>
+                        <td><input type="text" value="${p['客製化專屬文案']||''}" onchange="updateP(${i}, '客製化專屬文案', this.value)"></td>
+                        <td><input type="text" value="${p['產品圖片網址']||''}" onchange="updateP(${i}, '產品圖片網址', this.value)"></td>
+                        <td><input type="number" value="${p['單價']||''}" onchange="updateP(${i}, '單價', this.value)"></td>
+                        <td><input type="text" placeholder="如: 買3送1" value="${p['專屬優惠規則']||''}" onchange="updateP(${i}, '專屬優惠規則', this.value)"></td>
+                        <td style="text-align:center;"><button class="btn btn-red" style="padding:6px 10px;" onclick="delP(${i})">刪除</button></td>
+                    </tr>
+                `);
+            });
         }
 
-        // 4. 儲存至雲端 (夾帶密碼)
-        async function saveToServer() {
-            showMsg("儲存中，請勿關閉視窗...", "#f59e0b");
+        // 🛑 3. 禁忌警示渲染邏輯
+        function renderWarnings() {
+            const tbody = document.getElementById('warnings-tbody');
+            tbody.innerHTML = '';
+            (sysData.warnings || []).forEach((w, i) => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td><input type="text" placeholder="例: 抗凝血劑" value="${w['觸發標籤']||''}" onchange="updateW(${i}, '觸發標籤', this.value)"></td>
+                        <td><input type="text" placeholder="例: 魚油" value="${w['排除成分']||''}" onchange="updateW(${i}, '排除成分', this.value)"></td>
+                        <td><input type="text" placeholder="顯示給客人的警告語" value="${w['警示訊息']||''}" onchange="updateW(${i}, '警示訊息', this.value)"></td>
+                        <td style="text-align:center;"><button class="btn btn-red" style="padding:6px 10px;" onclick="delW(${i})">刪除</button></td>
+                    </tr>
+                `);
+            });
+        }
+
+        // --- 資料更新與增刪操作 ---
+        function updateQ(i, k, v) { sysData.questions[i][k] = v; }
+        function updateQOpt(qi, oi, k, v) { sysData.questions[qi]['選項設定'][oi][k] = v; }
+        function addQuestion() { sysData.questions.push({ '題號': 'Q', '題目類型': 'radio', '題目內容': '', '選項設定': [] }); renderQuestions(); }
+        function delQ(i) { if(confirm('刪除這題？')) { sysData.questions.splice(i, 1); renderQuestions(); } }
+        function addQOpt(qi) { sysData.questions[qi]['選項設定'].push({ text: '', target: '', tag: '無' }); renderQuestions(); }
+        function delQOpt(qi, oi) { sysData.questions[qi]['選項設定'].splice(oi, 1); renderQuestions(); }
+
+        function updateP(i, k, v) { sysData.products[i][k] = v; }
+        function addProduct() { sysData.products.push({}); renderProducts(); }
+        function delP(i) { if(confirm('刪除此商品？')) { sysData.products.splice(i, 1); renderProducts(); } }
+
+        function updateW(i, k, v) { sysData.warnings[i][k] = v; }
+        function addWarning() { sysData.warnings.push({}); renderWarnings(); }
+        function delW(i) { if(confirm('刪除此警示？')) { sysData.warnings.splice(i, 1); renderWarnings(); } }
+
+        // --- 🚀 終極一鍵儲存 (打包全部資料傳給 API) ---
+        async function saveAllToServer() {
+            showMsg("📦 正在將題庫、商品、警示同步至雲端，請勿關閉...", "#f59e0b");
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
-                        action: "updateQuestions",
-                        password: adminPassword, // 🛡️ 傳送密碼給 GAS 審查
-                        data: questions
+                        action: "updateAllAdminData",
+                        password: adminPassword,
+                        data: sysData
                     })
                 });
                 const result = await res.json();
                 
                 if(result.status === 'success') {
                     showMsg("✅ " + result.message, "#10b981");
+                    setTimeout(() => showMsg("", ""), 4000);
                 } else {
-                    showMsg("❌ 拒絕存取：" + result.message, "#ef4444");
-                    // 如果密碼錯誤，把使用者踢回登入頁
-                    if(result.message.includes("密碼錯誤")) {
-                        setTimeout(() => location.reload(), 2000);
-                    }
+                    showMsg("❌ 存取拒絕：" + result.message, "#ef4444");
                 }
             } catch(e) {
                 showMsg("❌ 網路錯誤，儲存失敗", "#ef4444");
