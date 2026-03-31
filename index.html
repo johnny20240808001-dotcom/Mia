@@ -1,310 +1,176 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mia 健康評估</title>
-    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
-        .card { background: white; width: 90%; max-width: 450px; padding: 35px 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); text-align: center; box-sizing: border-box; position: relative; overflow: hidden; margin: 20px 0; }
-        h2 { margin-top: 0; color: #0f172a; font-size: 22px; line-height: 1.4; }
-        .subtitle { font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
-        
-        /* 表單與按鈕 */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 5px; }
-        input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-        input:focus { border-color: #06C755; outline: none; }
-        .btn { display: block; width: 100%; padding: 16px; margin: 20px 0 0 0; background: #06C755; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn:active { background: #05a647; }
-        .btn-option { margin: 10px 0; background: #f8fafc; color: #333; border: 2px solid #e2e8f0; }
-        
-        /* 複選框 */
-        .chk-group { text-align: left; margin-top: 20px; }
-        .chk-label { display: block; padding: 15px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; font-weight: bold; }
-        .chk-label:has(input:checked) { border-color: #06C755; background: #f0fdf4; color: #06C755; }
-        
-        /* 報告與產品卡片設計 */
-        .warning-box { background: #fef2f2; border-left: 5px solid #ef4444; padding: 15px; text-align: left; margin-bottom: 20px; border-radius: 8px; font-size: 14px; color: #b91c1c; font-weight: bold; }
-        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 15px; padding: 15px; margin-bottom: 15px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px; }
-        .prod-img { width: 100%; height: 180px; object-fit: contain; border-radius: 10px; background: #f8fafc; }
-        .prod-title { font-size: 16px; font-weight: bold; color: #0f172a; margin: 0; }
-        .prod-desc { font-size: 13px; color: #64748b; line-height: 1.5; margin: 0; }
-        .prod-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; }
-        .prod-price { font-size: 18px; font-weight: bold; color: #ef4444; }
-        .prod-promo { font-size: 12px; background: #fef3c7; color: #d97706; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-        .qty-select { padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; font-weight: bold; }
-        
-        /* 結帳總計浮動列 */
-        .checkout-bar { background: #1e293b; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .checkout-total { font-size: 24px; font-weight: bold; color: #10b981; }
-        
-        .spinner { margin: 20px auto; width: 35px; height: 35px; border: 4px solid #e2e8f0; border-top-color: #06C755; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .preview-badge { background: #f59e0b; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; position: absolute; top: 10px; right: 10px; }
-    </style>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T.C STUDIO 個人營養分析</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f4f8; display: flex; justify-content: center; min-height: 100vh; margin: 0; color: #333; }
+    .card { background: white; width: 100%; max-width: 450px; padding: 30px; margin: 20px 0; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    h2, h3 { color: #2c3e50; text-align: center; }
+    
+    .btn-option { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; font-size: 16px; transition: 0.2s; text-align: left; }
+    .btn-option:hover { border-color: #3498db; background: #ebf5fb; color: #2980b9; }
+    
+    .hidden { display: none !important; }
+    
+    /* 報告卡片樣式 */
+    .report-box { border-left: 5px solid #3498db; background: #f8fafc; padding: 15px; margin-bottom: 20px; border-radius: 0 10px 10px 0; }
+    .report-title { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+    .report-dosage { font-size: 13px; color: #e67e22; font-weight: bold; background: #fdf2e9; display: inline-block; padding: 3px 8px; border-radius: 5px; margin-bottom: 8px;}
+    .report-desc { font-size: 14px; color: #555; line-height: 1.5; }
+    
+    #loading { text-align: center; color: #7f8c8d; margin-top: 50px; }
+    .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #aaa; }
+  </style>
 </head>
 <body>
 
-    <div id="app" class="card">
-        <div class="spinner"></div>
-        <p class="subtitle" style="margin-top:15px;">系統連線中...</p>
+  <div class="card">
+    <h2>T.C STUDIO 專業營養分析</h2>
+    
+    <div id="loading">藥師系統連線中，請稍候...</div>
+
+    <div id="quiz-container" class="hidden"></div>
+
+    <div id="result-container" class="hidden">
+      <p style="text-align: center; color: #7f8c8d; margin-bottom: 25px;">根據您的身體狀況，T.C STUDIO 藥師團隊建議您優先補充以下營養素：</p>
+      <div id="ingredient-list"></div>
     </div>
 
-    <script>
-        // ==========================================
-        const LIFF_ID = "2009556106-H69vePZ7"; 
-        // 🚨 請換成你最新部署的 V3.0 API 網址！
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8J2t6GZoheK3jfNDboRTH-tg-hxjZXkv365sQGzDHL7xEyfNpO_I8EuCybDk2FiyvDA/exec"; 
-        // ==========================================
+    <div class="footer">Copyright© T.C STUDIO 藥局版權所有</div>
+  </div>
 
-        let userData = { uid: '', name: '', birthday: '', height: '', weight: '', tags: [] };
-        let sysData = { questions: [], products: [], warnings: [] };
-        let finalRecommendations = []; // 最終選出的商品
+  <script>
+    let dbData = {}; 
+    let userStats = {};  // 儲存積分，例如 { eye_fatigue: 3 }
+    let userStatus = []; // 儲存禁忌標籤，例如 ['ban_pregnant', 'ban_surgery']
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPreview = urlParams.get('preview') === 'true';
+    // 1. 初始化：向後端請求資料
+    window.onload = function() {
+      google.script.run.withSuccessHandler(initQuiz).getQuizData();
+    };
 
-        async function initApp() {
-            try {
-                if (isPreview) {
-                    userData.uid = "preview-" + Math.floor(Math.random() * 1000);
-                    renderForm("測試員 (預覽)");
-                    return;
-                }
-                await liff.init({ liffId: LIFF_ID });
-                if (liff.isLoggedIn()) {
-                    document.getElementById('app').innerHTML = '<div class="spinner"></div><p class="subtitle">讀取資料中...</p>';
-                    const profile = await liff.getProfile();
-                    userData.uid = profile.userId;
-                    renderForm(profile.displayName);
-                } else { liff.login({ redirectUri: window.location.href }); }
-            } catch (err) { document.getElementById('app').innerHTML = `<h2>連線異常</h2><p>${err.message}</p>`; }
+    function initQuiz(data) {
+      dbData = data;
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('quiz-container').classList.remove('hidden');
+      renderQuestion(0); 
+    }
+
+    // 2. 渲染題目
+    function renderQuestion(index) {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = ''; 
+
+      // 檢查是否還有題目，沒有就進入結算
+      if (index >= dbData.questions.length) {
+        calculateReport();
+        return;
+      }
+
+      const q = dbData.questions[index];
+      
+      const title = document.createElement('h3');
+      title.innerText = q.title;
+      container.appendChild(title);
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.innerText = opt.option;
+        btn.onclick = () => handleAnswer(opt, index);
+        container.appendChild(btn);
+      });
+    }
+
+    // 3. 處理回答與跳題邏輯
+    function handleAnswer(opt, currentIndex) {
+      // 紀錄積分
+      if (opt.score_tag && opt.score_tag !== '-') {
+        if (!userStats[opt.score_tag]) userStats[opt.score_tag] = 0;
+        userStats[opt.score_tag] += opt.score_val;
+      }
+      
+      // 紀錄禁忌狀態 (如果有多個狀態用逗號分隔，程式會自動拆解)
+      if (opt.set_status && opt.set_status !== '-') {
+        const statuses = opt.set_status.split(',').map(s => s.trim());
+        userStatus.push(...statuses);
+      }
+
+      // 處理跳題 (next_q)
+      let nextIndex = currentIndex + 1; 
+      if (opt.next_q && opt.next_q !== '-') {
+        const jumpIndex = dbData.questions.findIndex(q => q.id === opt.next_q);
+        if (jumpIndex !== -1) nextIndex = jumpIndex; 
+      }
+
+      renderQuestion(nextIndex);
+    }
+
+    // 4. 核心大腦：計算營養報告
+    function calculateReport() {
+      document.getElementById('quiz-container').classList.add('hidden');
+      document.getElementById('result-container').classList.remove('hidden');
+      
+      let qualifiedIngredients = [];
+
+      // 階段一：過濾禁忌與分數門檻
+      dbData.ingredients.forEach(ing => {
+        // A. 禁忌檢查
+        let isBanned = false;
+        if (ing.ban_status && ing.ban_status !== '-') {
+          const bans = ing.ban_status.split(',').map(s => s.trim());
+          // 只要使用者的狀態中了任何一個禁忌，就排除
+          isBanned = bans.some(ban => userStatus.includes(ban));
         }
+        if (isBanned) return; // 觸發禁忌，直接跳過此成分
 
-        function renderForm(lineName) {
-            document.getElementById('app').innerHTML = `
-                ${isPreview ? '<div class="preview-badge">預覽模式</div>' : ''}
-                <h2>建立健康檔案</h2>
-                <p class="subtitle">請確認您的基本資料</p>
-                <div class="input-group"><label>真實姓名</label><input type="text" id="uiName" value="${lineName}"></div>
-                <div class="input-group"><label>出生年月日</label><input type="date" id="uiBirth"></div>
-                <div style="display: flex; gap: 10px;">
-                    <div class="input-group" style="flex: 1;"><label>身高 (cm)</label><input type="number" id="uiH"></div>
-                    <div class="input-group" style="flex: 1;"><label>體重 (kg)</label><input type="number" id="uiW"></div>
-                </div>
-                <button class="btn" onclick="startQuiz()">開始測驗</button>
-            `;
+        // B. 分數門檻檢查
+        const userScore = userStats[ing.req_tag] || 0;
+        if (userScore >= ing.min_score) {
+          qualifiedIngredients.push(ing);
         }
+      });
 
-        async function startQuiz() {
-            userData.name = document.getElementById('uiName').value;
-            userData.birthday = document.getElementById('uiBirth').value;
-            userData.height = document.getElementById('uiH').value;
-            userData.weight = document.getElementById('uiW').value;
-            if(!userData.name || !userData.birthday || !userData.height || !userData.weight) return alert("請完整填寫！");
-
-            document.getElementById('app').innerHTML = '<h2>題庫讀取中...</h2><div class="spinner"></div>';
-            
-            try {
-                const res = await fetch(GAS_API_URL);
-                const result = await res.json();
-                if(result.status === 'success' && result.data.questions.length > 0) {
-                    sysData = result.data;
-                    renderQ(sysData.questions[0]['題號']); 
-                } else { alert("找不到題庫，請檢查後台設定。"); }
-            } catch (err) { alert("網路異常，無法取得題庫"); }
+      // 階段二：處理同類互斥 (Priority 優先權爭奪戰)
+      let finalSelection = {}; 
+      
+      qualifiedIngredients.forEach(ing => {
+        const category = ing.category || ing.id; // 若無分類，則自成一類不互斥
+        
+        // 如果這個分類還沒入選任何成分，或是目前這個成分的 priority 更高，就替換掉
+        if (!finalSelection[category] || ing.priority > finalSelection[category].priority) {
+          finalSelection[category] = ing;
         }
+      });
 
-        function renderQ(qId) {
-            if(!qId || qId.toUpperCase() === 'RESULT') return processResult();
-            const q = sysData.questions.find(x => x['題號'] === qId);
-            if(!q) return alert(`找不到題號：${qId}`);
-            
-            let html = `<h2>${q['題目內容']}</h2>`;
-            const options = q['選項設定'] || [];
+      // 階段三：渲染最終報告畫面
+      renderReportUI(Object.values(finalSelection));
+    }
 
-            if (q['題目類型'] === 'checkbox') {
-                html += `<div class="chk-group">`;
-                options.forEach((opt, idx) => { html += `<label class="chk-label"><input type="checkbox" name="opt-chk" value="${idx}"> ${opt.text}</label>`; });
-                html += `</div><button class="btn" onclick="submitCheckbox('${qId}')">確認並進入下一題</button>`;
-            } else {
-                options.forEach(opt => { html += `<button class="btn btn-option" onclick="ans('${opt.target}', '${opt.tag}')">${opt.text}</button>`; });
-            }
-            document.getElementById('app').innerHTML = html;
-        }
+    // 5. 繪製報告畫面
+    function renderReportUI(finalList) {
+      const listDiv = document.getElementById('ingredient-list');
+      listDiv.innerHTML = '';
 
-        function ans(nextQId, tag) {
-            if(tag && tag !== '無') userData.tags.push(...tag.split(',').map(t=>t.trim()));
-            renderQ(nextQId);
-        }
+      if (finalList.length === 0) {
+        listDiv.innerHTML = "<div class='report-box'><p style='text-align:center;'>您目前的狀況十分良好！保持均衡飲食與規律作息即可，無需額外大量補充特殊營養素。</p></div>";
+        return;
+      }
 
-        function submitCheckbox(qId) {
-            const q = sysData.questions.find(x => x['題號'] === qId);
-            const checkboxes = document.querySelectorAll('input[name="opt-chk"]:checked');
-            if(checkboxes.length === 0) return alert("請至少勾選一個選項！");
-            
-            let nextQId = '';
-            checkboxes.forEach(box => {
-                const opt = q['選項設定'][box.value];
-                if(opt.tag && opt.tag !== '無') userData.tags.push(...opt.tag.split(',').map(t=>t.trim()));
-                if(!nextQId) nextQId = opt.target; 
-            });
-            renderQ(nextQId);
-        }
-
-        // 🧠 終極大腦：計算結果、禁忌、配對商品
-        async function processResult() {
-            document.getElementById('app').innerHTML = '<h2>智能分析中...</h2><p class="subtitle">正在配對專屬建議</p><div class="spinner"></div>';
-            
-            // 1. 去除重複標籤
-            let uniqueTags = [...new Set(userData.tags)];
-            let warningsToShow = [];
-
-            // 🛑 2. 禁忌防護機制 (AND 邏輯)
-            sysData.warnings.forEach(w => {
-                if(!w['觸發標籤']) return;
-                let conditions = w['觸發標籤'].split(',').map(t=>t.trim());
-                let isMatch = conditions.every(c => uniqueTags.includes(c));
-                
-                if(isMatch) {
-                    if(w['警示訊息']) warningsToShow.push(w['警示訊息']);
-                    if(w['排除成分']) {
-                        let toExclude = w['排除成分'].trim();
-                        uniqueTags = uniqueTags.filter(t => t !== toExclude); // 踢掉成分
-                    }
-                }
-            });
-
-            // 🛍️ 3. 產品選秀與 PK (分群 + 優先級比對)
-            let groupedProducts = {};
-            sysData.products.forEach(p => {
-                if(!p['對應標籤'] || !uniqueTags.includes(p['對應標籤'].trim())) return; // 客人沒這需求
-                
-                let conds = (p['觸發條件'] || '預設').split(',').map(t=>t.trim());
-                let isMatch = (conds[0] === '預設') || conds.every(c => uniqueTags.includes(c));
-                
-                if(isMatch) {
-                    let cat = p['產品分類'] || '未分類';
-                    if(!groupedProducts[cat]) groupedProducts[cat] = [];
-                    groupedProducts[cat].push(p);
-                }
-            });
-
-            finalRecommendations = [];
-            for (let cat in groupedProducts) {
-                // 依照優先級 (數字越大越贏) 排序，只取第一名
-                let sorted = groupedProducts[cat].sort((a, b) => (parseInt(b['優先級']) || 0) - (parseInt(a['優先級']) || 0));
-                finalRecommendations.push(sorted[0]);
-            }
-
-            // 存檔至後台
-            userData.tags = uniqueTags; // 存入已過濾的標籤
-            try { fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "saveResult", data: userData }) }); } catch(e){}
-
-            renderFinalReport(uniqueTags, warningsToShow);
-        }
-
-        // 📝 渲染最終精美報告
-        function renderFinalReport(tags, warnings) {
-            let html = `<h2>專屬分析報告</h2><p class="subtitle">${userData.name} 您好，為您配對以下方案：</p>`;
-            
-            // 繪製警示框
-            warnings.forEach(msg => { html += `<div class="warning-box">🛑 ${msg}</div>`; });
-            
-            if (finalRecommendations.length === 0) {
-                html += `<div style="padding:20px; background:#f0fdf4; border-radius:10px; color:#06C755; font-weight:bold;">您目前狀態維持良好，繼續保持！</div>`;
-            } else {
-                // 繪製商品卡片
-                finalRecommendations.forEach((p, index) => {
-                    let imgUrl = parseImgUrl(p['產品圖片網址']);
-                    let promoBadge = p['專屬優惠規則'] ? `<span class="prod-promo">🔥 ${p['專屬優惠規則']}</span>` : '';
-                    let price = parseInt(p['單價']) || 0;
-                    
-                    html += `
-                    <div class="product-card">
-                        ${imgUrl ? `<img src="${imgUrl}" class="prod-img">` : ''}
-                        <div>
-                            <div style="font-size:11px; color:#3b82f6; font-weight:bold; margin-bottom:5px;">${p['方案級別']||'基礎保養'}</div>
-                            <h3 class="prod-title">${p['推薦產品名稱'] || '專屬保健品'}</h3>
-                            <p class="prod-desc">${p['客製化專屬文案'] || ''}</p>
-                        </div>
-                        <div class="prod-price-row">
-                            <div><span style="font-size:12px;color:#94a3b8;">NT$</span><span class="prod-price">${price}</span> ${promoBadge}</div>
-                            <select class="qty-select" id="qty-${index}" onchange="calcTotal()">
-                                <option value="0">不需要</option>
-                                <option value="1" selected>1 件</option>
-                                <option value="2">2 件</option>
-                                <option value="3">3 件</option>
-                                <option value="4">4 件</option>
-                                <option value="5">5 件</option>
-                                <option value="6">6 件</option>
-                            </select>
-                        </div>
-                    </div>`;
-                });
-
-                // 結帳總計列
-                html += `
-                <div class="checkout-bar">
-                    <span style="font-size:14px;">專屬優惠總計</span>
-                    <span class="checkout-total">NT$ <span id="total-price">0</span></span>
-                </div>
-                <p style="font-size:11px; color:#94a3b8; margin-top:15px;">此建議為系統演算，不具醫療診斷效力。© T.C STUDIO</p>
-                `;
-            }
-            
-            html += `<button class="btn" style="background:#e2e8f0; color:#333;" onclick="location.reload()">重新測驗</button>`;
-            document.getElementById('app').innerHTML = html;
-            if(finalRecommendations.length > 0) calcTotal(); // 初始算錢
-        }
-
-        // 💰 優惠與總價計算機
-        function calcTotal() {
-            let total = 0;
-            finalRecommendations.forEach((p, index) => {
-                let qty = parseInt(document.getElementById(`qty-${index}`).value) || 0;
-                let price = parseInt(p['單價']) || 0;
-                let rule = p['專屬優惠規則'] || '';
-                
-                if(qty === 0) return; // 選不需要就跳過
-
-                let itemTotal = price * qty;
-                
-                // 解析 買X送Y
-                const buyGetMatch = rule.match(/買(\d+)送(\d+)/);
-                if (buyGetMatch) {
-                    const b = parseInt(buyGetMatch[1]);
-                    const f = parseInt(buyGetMatch[2]);
-                    const sets = Math.floor(qty / (b + f));
-                    const remain = qty % (b + f);
-                    itemTotal = ((sets * b) + remain) * price;
-                }
-                
-                // 解析 滿X件Y折
-                const discountMatch = rule.match(/滿(\d+)件(\d+)折/);
-                if (discountMatch) {
-                    const limit = parseInt(discountMatch[1]);
-                    let discount = parseInt(discountMatch[2]);
-                    if (discount > 0 && discount < 10) discount *= 10; // 8折轉換為80%
-                    if (qty >= limit) itemTotal = Math.round(price * qty * (discount / 100));
-                }
-                
-                total += itemTotal;
-            });
-            document.getElementById('total-price').innerText = total.toLocaleString();
-        }
-
-        // 🪄 Google Drive 圖片自動轉譯魔法
-        function parseImgUrl(url) {
-            if (!url) return '';
-            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-            if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            return url;
-        }
-
-        window.onload = initApp;
-    </script>
+      // 將最後選出的成分畫成精緻卡片
+      finalList.forEach(ing => {
+        listDiv.innerHTML += `
+          <div class="report-box">
+            <div class="report-title">${ing.name}</div>
+            ${ing.dosage ? `<div class="report-dosage">💡 建議：${ing.dosage}</div>` : ''}
+            <div class="report-desc">${ing.desc}</div>
+          </div>
+        `;
+      });
+    }
+  </script>
 </body>
 </html>
